@@ -14,23 +14,25 @@ const body = document.querySelector("body");
 const page = document.querySelector(".page");
 
 // Add a search bar and select its input and button elements
-
 const header = document.querySelector('header');
 const searchHTML = 
-   ` <label for="search" class="student-search">
-   <span>Search by name</span>
-   <input id="search" placeholder="Search by name...">
-   <button type="button"><img src="img/icn-search.svg" alt="Search icon"></button>
- </label>`;
-header.insertAdjacentHTML('beforeend', searchHTML);
-const searchInput = document.querySelector('#search');
-const searchButton = searchInput.nextElementSibling;
+          ` <label for="search" class="student-search">
+          <span>Search by name</span>
+          <input id="search" placeholder="Search by name...">
+          <button type="button"><img src="img/icn-search.svg" 
+          alt="Search icon"></button></label>`;
+      header.insertAdjacentHTML('beforeend', searchHTML);
+
 
 const authorSearch = document.getElementById('search');
-authorSearch.addEventListener('keyup', e => {
-  let currentValue = e.target.value.toLowerCase();
+      authorSearch.addEventListener('input', e => {
+  let currentValue = e.target.value.trim().toLowerCase();
   let authors = document.querySelectorAll('h3');
-authors.forEach(author => {
+  let filteredAuthors = data.filter(student => {
+const fullName = `${student.name.first} ${student.name.last}`.toLowerCase();
+return fullName.includes(currentValue)
+});
+      authors.forEach(author => {
   if (author.textContent.toLowerCase().includes(currentValue)) {
       author.parentNode.parentNode.style.display = 'block';
       document.querySelector('.link-list').style.display = 'none';
@@ -39,7 +41,18 @@ authors.forEach(author => {
       document.querySelector('.link-list').style.visibility = 'visible';
   }
   });
+// Update pagination buttons based on search results
+  showPage(filteredAuthors, 1);
+  addPagination(filteredAuthors);
+
+// Check if the search input is cleared
+  if (currentValue === '') {
+
+  location.reload()
+  }
 });
+
+
 
 /*
 Create the `showPage` function
@@ -49,14 +62,15 @@ function showPage(list, page)  {
   const startIndex = (page * 9) - 9;
   const endIndex = page * 9;
   
-  // Selecting the element "student-list" and assign HTML content to a empty string
-  const studentList = document.querySelector(".student-list");
-  studentList.innerHTML = " ";
+// Selecting the element "student-list" and assign HTML content to a empty string
+const studentList = document.querySelector(".student-list");
+      studentList.innerHTML = " ";
 
-    //Looping through the array of data objects
+//Looping through the array of data objects
     for (let i = 0; i < list.length; i++) {
       if (i >= startIndex && i < endIndex) {
-        // Create the html template literal for studentList
+        
+// Create the html template literal for studentList
         let html_literal = `<li class="student-item cf">
         <div class="student-details">
           <img class="avatar" src=${list[i].picture.large} alt= 'Profile Picture'>
@@ -82,42 +96,45 @@ const button = document.createElement("button");
 function addPagination(list) {
    const num_Page_ButN = Math.ceil(list.length / 9);
  
-   //creating link buttons with page numbers
+//creating link buttons with page numbers
    const linkList = document.querySelector(".link-list");
    linkList.innerHTML = "";
    
-   for (let i = 1; i <= num_Page_ButN; i++) {
-     
-     let html = `<li>
-          <button type="button">${i}</button>
-        </li>`;
-     
-        
-     //Appending linkList with the newly created buttons
-     linkList.insertAdjacentHTML("beforeend", html);
-   }
-   //button for page 1 and assign the class 'active'
+// Add a page button for each page
+  for (let i = 1; i <= num_Page_ButN; i++) {
+    addPageButton(linkList, i);
+  }
+
+//button for page 1 and assign the class 'active'
    const firstButton = document.querySelector("button");
+   if (firstButton) {
    firstButton.className = "active";
- 
-   //removing the 'active' class 
+   }
+
+//removing the 'active' class 
    linkList.addEventListener("click", (e) => {
      if (e.target.tagName === "BUTTON") {
        const elementActive = document.querySelector(".active");
+       if (elementActive) {
        elementActive.className = "";
+     }
        e.target.className = "active";
        //showPage function is passing in data and page number
-       showPage(data, e.target.textContent);
+       showPage(list, e.target.textContent);
      }
    });
  }
  
- // Call functions
+// Helper function to add a page button
+function addPageButton(linkList, pageNumber) {
+  let html = `<li>
+      <button type="button">${pageNumber}</button>
+    </li>`;
+
+// Appending linkList with the newly created button
+  linkList.insertAdjacentHTML("beforeend", html);
+}
+
+// Call functions
  showPage(data, 1);
  addPagination(data);
-
-
-
-
-
-
